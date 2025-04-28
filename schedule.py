@@ -68,6 +68,106 @@ if "selected_peserta" not in st.session_state:
 if "selected_wahana" not in st.session_state:
     st.session_state.selected_wahana = wahana["Nama Wahana"].tolist()
 
+# Stage 1: Integer Linear Programming (ILP) for initial allocation
+# def ilp_initial_allocation(peserta_list, wahana_df, patient_counts):
+#     """
+#     Use Integer Linear Programming to create an initial allocation that minimizes
+#     deviation from normal patient-to-student ratios
+#     """
+#     st.info("Running Integer Linear Programming for initial allocation...")
+#     progress_bar = st.progress(0)
+
+#     # Create mapping for wahana names to indices
+#     wahana_names = wahana_df['Nama Wahana'].tolist()
+#     wahana_indices = range(len(wahana_names))
+#     wahana_map = {name: idx for idx, name in enumerate(wahana_names)}
+
+#     # Create ILP problem
+#     prob = pulp.LpProblem("Student_Allocation", pulp.LpMinimize)
+
+#     # Create binary variables for student allocation
+#     # x[i,j] = 1 if student i is assigned to facility j
+#     x = {}
+#     for i in range(len(peserta_list)):
+#         for j in wahana_indices:
+#             x[i, j] = pulp.LpVariable(f"x_{i}_{j}", cat=pulp.LpBinary)
+
+#     # Create variables for deviation from normal range
+#     under_dev = {}
+#     over_dev = {}
+#     for j in wahana_indices:
+#         under_dev[j] = pulp.LpVariable(f"under_dev_{j}", lowBound=0, cat=pulp.LpContinuous)
+#         over_dev[j] = pulp.LpVariable(f"over_dev_{j}", lowBound=0, cat=pulp.LpContinuous)
+
+#     # Get minimum and maximum normal patient counts
+#     min_normal = {}
+#     max_normal = {}
+#     for j in wahana_indices:
+#         wahana_name = wahana_names[j]
+#         min_normal[j] = wahana_df.loc[wahana_df['Nama Wahana'] == wahana_name, 'Min_Pasien'].values[0]
+#         max_normal[j] = wahana_df.loc[wahana_df['Nama Wahana'] == wahana_name, 'Max_Pasien'].values[0]
+
+#     # Map patient counts to wahana indices
+#     patients_per_wahana = {}
+#     for j in wahana_indices:
+#         wahana_name = wahana_names[j]
+#         patients_per_wahana[j] = patient_counts.loc[patient_counts['Nama Wahana'] == wahana_name, 'Realita Jumlah Pasien'].values[0]
+
+#     # Add objective function: minimize total deviation
+#     prob += pulp.lpSum([under_dev[j] + over_dev[j] for j in wahana_indices])
+
+#     # Constraints:
+
+#     # 1. Each student must be assigned to exactly one facility
+#     for i in range(len(peserta_list)):
+#         prob += pulp.lpSum([x[i, j] for j in wahana_indices]) == 1
+
+#     # 2. Patient-to-student ratio constraints
+#     for j in wahana_indices:
+#         # Calculate total students assigned to facility j
+#         students_at_j = pulp.lpSum([x[i, j] for i in range(len(peserta_list))])
+
+#         # Calculate patients per student
+#         # To avoid division by zero, we use linear constraints
+
+#         # If under minimum range, calculate under_deviation
+#         prob += min_normal[j] * students_at_j - patients_per_wahana[j] <= under_dev[j]
+
+#         # If over maximum range, calculate over_deviation
+#         prob += patients_per_wahana[j] - max_normal[j] * students_at_j <= over_dev[j]
+
+#     # Update progress
+#     progress_bar.progress(0.3)
+
+#     # Solve the problem
+#     solver = pulp.PULP_CBC_CMD(msg=False)
+#     prob.solve(solver)
+
+#     progress_bar.progress(0.7)
+
+#     # Extract the solution
+#     assignment = {}
+#     allocation = {wahana_name: [] for wahana_name in wahana_names}
+
+#     if prob.status == pulp.LpStatusOptimal:
+#         for i in range(len(peserta_list)):
+#             for j in wahana_indices:
+#                 if pulp.value(x[i, j]) == 1:
+#                     student_id = peserta_list[i]
+#                     wahana_name = wahana_names[j]
+#                     assignment[student_id] = wahana_name
+#                     allocation[wahana_name].append(student_id)
+#     else:
+#         st.error("Failed to find optimal solution with ILP")
+
+#     progress_bar.progress(1.0)
+#     st.success("Integer Linear Programming allocation completed")
+
+#     return {
+#         'final': assignment,
+#         'initial': allocation
+#     }
+
 # Stage 1: Simple allocation for initial distribution
 def roundrobin_initial_allocation(peserta_list, wahana_df, patient_counts):
 
