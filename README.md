@@ -49,5 +49,5 @@ Aplikasi ini menggunakan kecerdasan buatan untuk melakukan penjadwalan peserta d
 
 ## Interface
 
-![Tampilan Proses Analisis 1](images/gambar1.png)
-![Tampilan Hasil Analisis 1](images/gambar2.png)
+![Tampilan Proses Analisis 1](Images/gambar1.png)
+![Tampilan Hasil Analisis 1](Images/gambar2.png)
